@@ -1,80 +1,9 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/gorilla/mux"
-)
-
-type Employee struct {
-	Name  string `json:"Name"`
-	Email string `json:"Email"`
-}
-
-type EmployeeAll struct {
-	EmpAll []Employee `json:"AllEmp"` // JSON name should be the resource name given in json to be parsed
-}
-
-var emp EmployeeAll
+import "github.com/Priyakr2205/TestApI/app"
 
 func main() {
 
-	fmt.Println("Hello World ..!!")
-	hmux := mux.NewRouter()
-	readJSON()
-	hmux.HandleFunc("/Employee", getEmployees).Methods("GET")
-	log.Fatal(http.ListenAndServe("localhost:8000", hmux))
+	app.Start()
 
-}
-
-func readJSON() {
-	// Open our jsonFile
-	jsonFile, err := os.Open("Employee.json")
-	// if we os.Open returns an error then handle it
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println("Successfully Opened users.json")
-
-	defer jsonFile.Close()
-
-	// read our opened jsonFile as a byte array.
-	fbytes, err := ioutil.ReadAll(jsonFile)
-
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-
-	fmt.Println("Successsfully read json file")
-	fmt.Println(fbytes)
-
-	err = json.Unmarshal(fbytes, &emp)
-
-	if err != nil {
-		fmt.Println("Unmarshalling failed")
-	}
-
-	fmt.Println("Unmarshalled")
-	fmt.Println(emp)
-	for i := 0; i < len(emp.EmpAll); i++ {
-		fmt.Println(emp.EmpAll[i].Name)
-		fmt.Println(emp.EmpAll[i].Email)
-	}
-
-}
-
-func getEmployees(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Set("Content-Type", "application/json") // This line should before anything is send as response.
-	fmt.Println(w)
-	fmt.Println(*r)
-	fmt.Fprint(w, "Hello\n")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(emp.EmpAll)
 }
